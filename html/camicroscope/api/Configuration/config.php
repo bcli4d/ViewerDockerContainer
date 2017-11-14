@@ -29,6 +29,7 @@ return array(
     'getFileLocation' => "$imageUrl/query/getFileLocationByIID?api_key=",
     'getMPP' => "$imageUrl/query/getMPPByIID?api_key=",
     'fastcgi_server' => "/fcgi-bin/iipsrv.fcgi",
+    'getSlideBarcode' => "https://mvm-dot-isb-cgc.appspot.com/images/",
     
      /* Dynamic Services */
     'postWorkOrder' => "$dynamicServices/WorkOrders/submit/json",

@@ -41,6 +41,7 @@
         <script type="text/javascript" src="js/mootools/mootools-more-1.4.0.1-compressed.js"></script>
         <script src="js/annotationtools/annotools-openseajax-handler.js"></script>
         <script src="js/imagemetadatatools/osdImageMetadata.js"></script>
+        <script src="js/imagemetadatatools/osdImageMetadataFromSlideBarcode.js"></script>
         <script src="js/annotationtools/ToolBar.js"></script>
         <script src="js/annotationtools/AnnotationStore.js"></script>
         <script src="js/annotationtools/osdAnnotationTools.js"></script>
@@ -106,11 +107,19 @@
         <script type="text/javascript">
           $.noConflict();
           var annotool = null;
-          var tissueId = <?php echo json_encode($_GET['tissueId']); ?>;
+	  var tissueId = null;
+	  
+	  var imageId = null;
+	  var slideBarcode = null;
+	  var imagedata = null;
 
+          if ((imageId = <?php echo json_encode($_GET['tissueId']); ?>) != null) {
+	       imagedata = new OSDImageMetaData({imageId:imageId});
+          }
+	  else if ((imageId = <?php echo json_encode($_GET['slideBarcode']); ?>) != null){
+	       imagedata = new OSDImageMetaDataFromSlideBarcode({imageId:imageId});
+	  }
 
-          var imagedata = new OSDImageMetaData({imageId:tissueId});
-         
           var MPP = imagedata.metaData[0];
 
 
