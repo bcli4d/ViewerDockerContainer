@@ -3,6 +3,15 @@
 #nohup nodejs bin/www &
 #cd ../bindaas/bin
 #sh startup.sh &
+
+array=(${GCSFUSEMOUNTS//,/ })
+for e in "${array[@]}"; 
+do 
+    mkdir -p /data/images/$e
+    chown www-data:www-data /data/images/$e
+    /bin/su -s /bin/bash -c "gcsfuse $e /data/images/$e" www-data; 
+done
+
 rm -f /var/run/apache2.pid
 service apache2 start
 htpasswd -bc /etc/apache2/.htpasswd admin quip2017
