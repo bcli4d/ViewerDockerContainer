@@ -161,12 +161,37 @@ RUN git clone -b release https://github.com/camicroscope/caMicroscope.git /var/w
 COPY apache2-iipsrv-fcgid.conf /root/src/iip-openslide-docker/apache2-iipsrv-fcgid.conf
 
 RUN pear install http_request2
-COPY run.sh /root/run.sh
+#COPY run.sh /root/run.sh
+### Seem to need to do an update in order to successfully install default-jdk
+RUN apt-get update && apt-get -y upgrade
 RUN  apt-get install -y default-jdk
 
 COPY html/FlexTables/ /var/www/html/FlexTables/
 COPY html/featurescapeapps/ /var/www/html/featurescapeapps/
 
-CMD ["sh", "/root/run.sh"]
+COPY apache2-iipsrv-fcgid.conf /root/src/iip-openslide-docker/apache2-iipsrv-fcgid.conf
+RUN rm -rf /var/www/html/camicroscope
+RUN mkdir -p /var/www/html/camicroscope
+
+### Install gcsfuse
+RUN echo "deb http://packages.cloud.google.com/apt gcsfuse-`lsb_release -c -s` main" | tee /etc/apt/sources.list.d/gcsfuse.list
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+RUN apt-get -y update
+RUN apt-get -y install gcsfuse
+
+COPY run.BQ3.sh /root/run.sh
+
+### Temporary. Remove after the above git clones pull from our repos
+COPY html/config/security_config.php /var/www/html/config
+COPY html/camicroscope /var/www/html/camicroscope
+
+EXPOSE 80
+
+### Mount these buckets under /data/images
+ENV GCSFUSEMOUNTS=isb-cgc-open,svs-images,svs-images-mr
+
+#cmd ["sh", "/root/run.sh"]
+### Script requires bash
+CMD ["/bin/bash", "/root/run.sh"]
 
 #CMD service apache2 start && tail -F /var/log/apache2/access.log
