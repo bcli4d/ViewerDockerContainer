@@ -154,11 +154,10 @@ RUN rm -rf /var/www/html
 RUN git clone -b release  https://github.com/camicroscope/Security.git /var/www/html
 RUN git clone -b release https://github.com/camicroscope/caMicroscope.git /var/www/html/camicroscope
 
-
-
 #RUN service apache2 start
 
-COPY apache2-iipsrv-fcgid.conf /root/src/iip-openslide-docker/apache2-iipsrv-fcgid.conf
+### moving this closer to the end of the build so we can change and quickly rebuild
+#COPY apache2-iipsrv-fcgid.conf /root/src/iip-openslide-docker/apache2-iipsrv-fcgid.conf
 
 RUN pear install http_request2
 #COPY run.sh /root/run.sh
@@ -169,26 +168,28 @@ RUN  apt-get install -y default-jdk
 COPY html/FlexTables/ /var/www/html/FlexTables/
 COPY html/featurescapeapps/ /var/www/html/featurescapeapps/
 
-COPY apache2-iipsrv-fcgid.conf /root/src/iip-openslide-docker/apache2-iipsrv-fcgid.conf
-RUN rm -rf /var/www/html/camicroscope
-RUN mkdir -p /var/www/html/camicroscope
-
 ### Install gcsfuse
 RUN echo "deb http://packages.cloud.google.com/apt gcsfuse-`lsb_release -c -s` main" | tee /etc/apt/sources.list.d/gcsfuse.list
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN apt-get -y update
 RUN apt-get -y install gcsfuse
 
-COPY run.BQ3.sh /root/run.sh
+COPY run.sh /root/run.sh
 
-### Temporary. Remove after the above git clones pull from our repos
+### Temporary. Remove next four lines after the above git clones pull from our repos
+RUN rm -rf /var/www/html/camicroscope
+RUN mkdir -p /var/www/html/camicroscope
 COPY html/config/security_config.php /var/www/html/config
 COPY html/camicroscope /var/www/html/camicroscope
 
+### Do we need this to ru in kubernetes?
 EXPOSE 80
 
 ### Mount these buckets under /data/images
 ENV GCSFUSEMOUNTS=isb-cgc-open,svs-images,svs-images-mr
+
+### Moved this here from earlier so we can experiment with various settings and quicly rebuild
+COPY apache2-iipsrv-fcgid.conf /root/src/iip-openslide-docker/apache2-iipsrv-fcgid.conf
 
 #cmd ["sh", "/root/run.sh"]
 ### Script requires bash
