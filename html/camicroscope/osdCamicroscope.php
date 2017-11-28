@@ -109,15 +109,13 @@
           var annotool = null;
 	  var tissueId = null;
 	  
-	  var imageId = null;
-	  var slideBarcode = null;
 	  var imagedata = null;
 
-          if ((imageId = <?php echo json_encode($_GET['tissueId']); ?>) != null) {
-	       imagedata = new OSDImageMetaData({imageId:imageId});
+          if ((tissueId = <?php echo json_encode($_GET['tissueId']); ?>) != null) {
+	       imagedata = new OSDImageMetaData({imageId:tissueId});
           }
-	  else if ((imageId = <?php echo json_encode($_GET['slideBarcode']); ?>) != null){
-	       imagedata = new OSDImageMetaDataFromSlideBarcode({imageId:imageId});
+	  else if ((tissueId = <?php echo json_encode($_GET['slideBarcode']); ?>) != null){
+	       imagedata = new OSDImageMetaDataFromSlideBarcode({imageId:tissueId});
 	  }
 
           var MPP = imagedata.metaData[0];
